@@ -1,0 +1,44 @@
+<idea-plugin>
+  <!--  插件 ID，用于在插件市场中唯一确定身份的标示，在不同版本中，必须保持一致。建议设置值为：包名 + 插件名称-->
+  <id>com.tfx.jspo</id>
+  <!--  插件的名称，显示在 IDEA 已安装插件列表中-->
+  <name>jspo</name>
+  <version>1.01</version>
+  <vendor email="15755502377@163.com" url="15755502377@163.com">tianfangxu</vendor>
+
+  <!--  插件功能说明，显示在插件市场当前插件的副标题位置。-->
+  <description><![CDATA[
+  该插件是一个 java 工具类，能将json格式化、并可转 pojo 类。
+  This plugin is a Java utility class that can format JSON and convert it to POJO classes.
+  (tips:有问题欢迎联系：15755502377@163.com)<br><em></em>]]></description>
+
+  <!--  插件版本更新内容说明-->
+  <change-notes><![CDATA[
+  删除了一些不兼容的 API 和格式化、优化 代码<br><em></em>]]></change-notes>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <!--  当前插件的起止 IDE 版本支持-->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!--  当前插件依赖的其他插件的id，本人没用过-->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <toolWindow id="Jspo" factoryClass="com.tfx.MainUI"
+                canCloseContents="false"
+                anchor="right"/>
+  </extensions>
+
+
+  <actions>
+    <!-- 最核心的标签。每一个 action 标签代表一个菜单项或工具栏中的一个按钮。在 action 标签中间，还可以配置 keyboard-shortcut 标签，用来设置快捷键 -->
+    <action id="Jspo" class="com.tfx.JspoRun" text="Jspo" description="Jspo" >
+      <add-to-group group-id="WindowMenu" anchor="last"/>
+    </action>
+  </actions>
+
+</idea-plugin>
