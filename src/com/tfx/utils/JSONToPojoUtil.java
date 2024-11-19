@@ -2,8 +2,6 @@ package com.tfx.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tfx.mod.Node;
 import com.tfx.mod.Pojo;
@@ -105,7 +103,9 @@ public class JSONToPojoUtil {
                 pojo.getFields().add(new Node(cc.getName(),keyRule(key),null,cc));
                 megerJsonPojo(keyVals,cc);
             }else{
-                pojo.getFields().add(new Node(val.getClass().getSimpleName(),keyRule(key),null,null));
+                Node node = new Node(val.getClass().getSimpleName(), keyRule(key), null, null);
+                node.setDesc(String.valueOf(val));
+                pojo.getFields().add(node);
                 
             }
         }
@@ -185,7 +185,6 @@ public class JSONToPojoUtil {
 
     public static void main(String[] args) {
         String json = "[{  \"code\": 200,  \"message\": \"ok\",  \"status\": true,  \"user\": null,  \"data\": {    \"empId\": \"OIUJKT\",    \"empName\": \"张三\",    \"memberId\": \"ILKYUX\",    \"memberName\": \"社保科技\",    \"costId\": \"PLKHXJ\",    \"costName\": \"社保科技北京分公司\",    \"orderList\": [      {        \"areaId\": \"Y6G2H7\",        \"areaName\": \"上海\",        \"insOrgId\": \"OI8WEU\",        \"insOrgName\": \"上海社保\",        \"insType\": 1,        \"insCode\": \"30\",        \"insName\": \"养老保险\",        \"accountStatus\": 1,        \"feeMonth\": 202209,        \"orgBase\": 3000,        \"orgFee\": 600,        \"orgProp\": 20,        \"empBase\": 3000,        \"empFee\": 300,        \"empProp\": 10,        \"overdueFee\": 0,        \"totalFee\": 900      },      {        \"areaId\": \"Y6G2H7\",        \"areaName\": \"上海\",        \"insOrgId\": \"OI8WEU\",        \"insOrgName\": \"上海社保\",        \"insType\": 1,        \"insCode\": \"40\",        \"insName\": \"医疗保险\",        \"accountStatus\": 1,        \"feeMonth\": 202209,        \"orgBase\": 3000,        \"orgFee\": 60,        \"orgProp\": 2,        \"empBase\": 3000,        \"empFee\": 60,        \"empProp\": 2,        \"overdueFee\": 0,        \"totalFee\": 120      },      {        \"areaId\": \"Y6G2H7\",        \"areaName\": \"上海\",        \"insOrgId\": \"OI8WEB\",        \"insOrgName\": \"上海公积金\",        \"insType\": 2,        \"insCode\": \"20\",        \"insName\": \"公积金\",        \"accountStatus\": 1,        \"feeMonth\": 202209,        \"orgBase\": 3000,        \"orgFee\": 210,        \"orgProp\": 7,        \"empBase\": 3000,        \"empFee\": 210,        \"empProp\": 7,        \"overdueFee\": 0,        \"totalFee\": 420      }    ]  }}]";
-        System.out.println(toJsonString(json));
-        //test();
+        System.out.println(json);
     }
 }

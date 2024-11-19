@@ -45,6 +45,17 @@ public class MainUI implements ToolWindowFactory, DumbAware {
 
     private Project project;
     private Pojo root;
+
+    public static void main(String[] args) {
+        JFrame jf = new JFrame("test");
+        jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        JComponent jComponent = new MainUI().getJspo();
+
+        jf.setContentPane(jComponent);
+        jf.pack();
+        jf.setLocationRelativeTo(null);
+        jf.setVisible(true);
+    }
     
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
@@ -67,6 +78,10 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         transfer.setLocation(5,5);
         transfer.setSize(120,26);
 
+        JButton clear = new JButton("clear清除");
+        clear.setLocation(130,5);
+        clear.setSize(120,26);
+
         JBTextArea jsonArea = new JBTextArea();
         jsonArea.setLocation(5,40);
         jsonArea.setSize(360,240);
@@ -79,11 +94,13 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         message.setForeground(JBColor.RED);
 
         transfer.addActionListener(getBuildJson(panel,jsonArea));
+        clear.addActionListener(clearJson(panel,jsonArea));
 
 
 
         /* 添加 组件 到 内容面板 */
         panel.add(transfer);
+        panel.add(clear);
         panel.add(areaScrollPane);
         panel.add(message);
 
@@ -92,13 +109,25 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         return new JBScrollPane(panel);
     }
 
-    public ActionListener getBuildJson(JPanel panel,JTextArea jsonArea){
+    private ActionListener clearJson(JPanel panel, JBTextArea jsonArea) {
         return (actionEvent)->{
-            while (panel.getComponentCount() >= 4){
-                panel.remove(3);
+            while (panel.getComponentCount() >= 5){
+                panel.remove(4);
             }
             panel.setPreferredSize(new Dimension(360,300));
-            JLabel message = (JLabel)panel.getComponent(2);
+            JLabel message = (JLabel)panel.getComponent(3);
+            message.setSize(0,0);
+            jsonArea.setText("");
+        };
+    }
+
+    public ActionListener getBuildJson(JPanel panel,JTextArea jsonArea){
+        return (actionEvent)->{
+            while (panel.getComponentCount() >= 5){
+                panel.remove(4);
+            }
+            panel.setPreferredSize(new Dimension(360,300));
+            JLabel message = (JLabel)panel.getComponent(3);
             message.setSize(0,0);
             String text = jsonArea.getText();
             try {
@@ -202,15 +231,16 @@ public class MainUI implements ToolWindowFactory, DumbAware {
 
             index += 30;
             for (Node pojoField : pojo.getFields()) {
-                JTextField col1 = new JTextField(100);
+                
+                JTextField col1 = new JTextField(60);
                 col1.setLocation(10,index);
-                col1.setSize(100,30);
+                col1.setSize(60,30);
                 col1.setText(pojoField.getPre());
                 panel.add(col1);
                 pojoField.setPreJcp(col1);
 
                 JTextField col2 = new JTextField(100);
-                col2.setLocation(110,index);
+                col2.setLocation(70,index);
                 col2.setSize(100,30);
                 col2.setText(pojoField.getCompleteType());
                 col2.setEditable(pojoField.getRelation() == null);
@@ -218,11 +248,16 @@ public class MainUI implements ToolWindowFactory, DumbAware {
                 pojoField.setTypeJcp(col2);
 
                 JTextField col3 = new JTextField(150);
-                col3.setLocation(210,index);
+                col3.setLocation(170,index);
                 col3.setSize(150,30);
                 col3.setText(pojoField.getKey());
                 panel.add(col3);
                 pojoField.setKeyJcp(col3);
+
+                JLabel deswc = new JLabel("  example: "+(pojoField.getDesc()==null?"":pojoField.getDesc()));
+                deswc.setLocation(330,index);
+                deswc.setSize(300,30);
+                panel.add(deswc);
 
                 index += 30;
                 if (pojoField.getRelation() != null){

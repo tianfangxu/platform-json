@@ -23,6 +23,8 @@ public class Node {
     private JTextField keyJcp;
 
     private Pojo relation;
+    
+    private String desc;
 
     public Node(String type, String key,String typeFormat, Pojo relation) {
         this.type = type;
@@ -95,6 +97,14 @@ public class Node {
         this.relation = relation;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     @Override
     public String toString() {
         return "Node{" +
@@ -103,6 +113,7 @@ public class Node {
                 ", type='" + type + '\'' +
                 ", key='" + key + '\'' +
                 ", relation=" + relation +
+                ", desc=" + desc +
                 '}';
     }
     
