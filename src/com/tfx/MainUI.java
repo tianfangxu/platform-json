@@ -20,7 +20,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
 import com.tfx.mod.Node;
 import com.tfx.mod.Pojo;
 import com.tfx.utils.JSONToPojoUtil;
@@ -62,8 +61,7 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         try {
             this.project = project;
             JComponent jComponent = getJspo();
-            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-            Content content = contentFactory.createContent(jComponent, "Jspo", false);
+            Content content = toolWindow.getContentManager().getFactory().createContent(jComponent, "Jspo", false);
             toolWindow.getContentManager().addContent(content);
         } catch (Exception e) {
             e.printStackTrace();
