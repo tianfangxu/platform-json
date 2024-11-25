@@ -17,8 +17,12 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.content.Content;
 import com.tfx.mod.Node;
 import com.tfx.mod.Pojo;
@@ -69,7 +73,7 @@ public class MainUI implements ToolWindowFactory, DumbAware {
     }
 
     private JComponent getJspo(){
-        JPanel panel = new JPanel(null);
+        JPanel panel = new JBPanel(null);
         panel.setPreferredSize(new Dimension(360,300));
 
         JButton transfer = new JButton("json预览");
@@ -87,7 +91,7 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         areaScrollPane.setLocation(5,40);
         areaScrollPane.setSize(360,240);
 
-        JLabel message = new JLabel();
+        JLabel message = new JBLabel();
         message.setLocation(5,285);
         message.setForeground(JBColor.RED);
 
@@ -140,10 +144,28 @@ public class MainUI implements ToolWindowFactory, DumbAware {
             JButton create = new JButton("全部生成");
             create.setLocation(5,285);
             create.setSize(200,30);
-            create.addActionListener(getCreateListener());
             panel.add(create);
 
-            Integer index = builderPanel(panel, Collections.singletonList(root), 315);
+            JLabel notesLabel = new JBLabel("注释:");
+            notesLabel.setLocation(220,285);
+            notesLabel.setSize(35,30);
+            panel.add(notesLabel);
+
+            JBRadioButton yes = new JBRadioButton("y",true);
+            yes.setLocation(260,285);
+            yes.setSize(40,30);
+            JBRadioButton no = new JBRadioButton("n");
+            no.setLocation(300,285);
+            no.setSize(40,30);
+            ButtonGroup genderGroup = new ButtonGroup();
+            genderGroup.add(yes);
+            genderGroup.add(no);
+            panel.add(yes);
+            panel.add(no);
+
+            create.addActionListener(getCreateListener(yes));
+
+            Integer index = builderPanel(panel,yes, Collections.singletonList(root), 315);
             builderListener(root);
             panel.setPreferredSize(new Dimension(360,index+40));
             panel.repaint();
@@ -155,7 +177,7 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         };
     }
 
-    private ActionListener getCreateListener() {
+    private ActionListener getCreateListener(JBRadioButton jbRadioButton) {
         return (actionEvent)->{
             PackageChooserDialog classPathChooser = new PackageChooserDialog("ClassPath Chooser", project);
             classPathChooser.show();
@@ -163,22 +185,22 @@ public class MainUI implements ToolWindowFactory, DumbAware {
             if (selectedPackage != null){
                 PsiDirectory selectPath = getSelectPath(selectedPackage.getDirectories());
                 resetVal(root);
-                createAll(root,selectPath);
+                createAll(root,selectPath,jbRadioButton.isSelected());
             } 
         };
     }
     
-    private void createAll(Pojo pojo,PsiDirectory selectPath){
+    private void createAll(Pojo pojo,PsiDirectory selectPath,boolean isSelected){
         List<Node> fields = pojo.getFields();
         if (fields != null || fields.size() > 0){
             for (Node field : fields) {
                 Pojo relation = field.getRelation();
                 if (relation != null){
-                    createAll(relation,selectPath);
+                    createAll(relation,selectPath,isSelected);
                 }
             }
         }
-        createJavaFileWithContent(selectPath,pojo.getName(),JSONToPojoUtil.writeClass(pojo));
+        createJavaFileWithContent(selectPath,pojo.getName(),JSONToPojoUtil.writeClass(pojo,isSelected));
     }
     
     private void resetVal(Pojo pojo){
@@ -194,18 +216,18 @@ public class MainUI implements ToolWindowFactory, DumbAware {
         }
     }
 
-    public Integer builderPanel(JPanel panel,List<Pojo> pojos,Integer index){
+    public Integer builderPanel(JPanel panel,JBRadioButton jbRadioButton,List<Pojo> pojos,Integer index){
         if (pojos == null || pojos.size() == 0){
             return index;
         }
         List<Pojo> childs = new ArrayList<>();
         for (Pojo pojo : pojos) {
-            JLabel classNameTip = new JLabel("className:");
+            JLabel classNameTip = new JBLabel("className:");
             classNameTip.setLocation(5,index);
             classNameTip.setSize(80,30);
             panel.add(classNameTip);
 
-            JTextField className = new JTextField(170);
+            JTextField className = new JBTextField(170);
             className.setLocation(90,index);
             className.setSize(170,30);
             className.setText(pojo.getName());
@@ -223,21 +245,21 @@ public class MainUI implements ToolWindowFactory, DumbAware {
                 if (selectedPackage != null){
                     PsiDirectory selectPath = getSelectPath(selectedPackage.getDirectories());
                     resetVal(pojo);
-                    createJavaFileWithContent(selectPath,pojo.getName(),JSONToPojoUtil.writeClass(pojo));
+                    createJavaFileWithContent(selectPath,pojo.getName(),JSONToPojoUtil.writeClass(pojo,jbRadioButton.isSelected()));
                 }
             });
 
             index += 30;
             for (Node pojoField : pojo.getFields()) {
                 
-                JTextField col1 = new JTextField(60);
+                JTextField col1 = new JBTextField(60);
                 col1.setLocation(10,index);
                 col1.setSize(60,30);
                 col1.setText(pojoField.getPre());
                 panel.add(col1);
                 pojoField.setPreJcp(col1);
 
-                JTextField col2 = new JTextField(100);
+                JTextField col2 = new JBTextField(100);
                 col2.setLocation(70,index);
                 col2.setSize(100,30);
                 col2.setText(pojoField.getCompleteType());
@@ -245,14 +267,14 @@ public class MainUI implements ToolWindowFactory, DumbAware {
                 panel.add(col2);
                 pojoField.setTypeJcp(col2);
 
-                JTextField col3 = new JTextField(150);
+                JTextField col3 = new JBTextField(150);
                 col3.setLocation(170,index);
                 col3.setSize(150,30);
                 col3.setText(pojoField.getKey());
                 panel.add(col3);
                 pojoField.setKeyJcp(col3);
 
-                JLabel deswc = new JLabel("  example: "+(pojoField.getDesc()==null?"":pojoField.getDesc()));
+                JLabel deswc = new JBLabel("  example: "+(pojoField.getDesc()==null?"":pojoField.getDesc()));
                 deswc.setLocation(330,index);
                 deswc.setSize(300,30);
                 panel.add(deswc);
@@ -264,13 +286,13 @@ public class MainUI implements ToolWindowFactory, DumbAware {
             }
         }
         if (childs.size() > 0) {
-            JLabel dividerLabel = new JLabel("———————————next———————————");
+            JLabel dividerLabel = new JBLabel("———————————next———————————");
             dividerLabel.setLocation(0,index);
             dividerLabel.setSize(360,30);
             dividerLabel.setForeground(JBColor.RED);
             panel.add(dividerLabel);
         }
-        return builderPanel(panel,childs,index+30);
+        return builderPanel(panel,jbRadioButton,childs,index+30);
     }
 
 

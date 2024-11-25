@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.tfx.mod.Node;
 import com.tfx.mod.Pojo;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +104,9 @@ public class JSONToPojoUtil {
                 pojo.getFields().add(new Node(cc.getName(),keyRule(key),null,cc));
                 megerJsonPojo(keyVals,cc);
             }else{
+                if (val instanceof  Double){
+                    val = new BigDecimal(val.toString());
+                }
                 Node node = new Node(val.getClass().getSimpleName(), keyRule(key), null, null);
                 node.setDesc(String.valueOf(val));
                 pojo.getFields().add(node);
@@ -142,19 +146,29 @@ public class JSONToPojoUtil {
         return new String(chars);
     }
     
-    public static String writeClass(Pojo pojo){
+    public static String writeClass(Pojo pojo,boolean noteFlag){
         StringBuilder builder = new StringBuilder();
         boolean isList = false;
+        boolean isBigDecimal = false;
         for (Node field : pojo.getFields()) {
             if (field.getCompleteType().contains("List")) {
                 isList = true;
+            }
+            if (field.getCompleteType().contains("BigDecimal")) {
+                isBigDecimal = true;
             }
         }
         if (isList) {
             builder.append("import java.util.List;\n\n");
         }
+        if (isBigDecimal) {
+            builder.append("import java.math.BigDecimal;\n\n");
+        }
         builder.append("public class ").append(pojo.getName()).append("{\n\n");
         for (Node field : pojo.getFields()) {
+            if (noteFlag) {
+                builder.append("    /** example: ").append(field.getDesc()).append(" */\n");
+            }
             builder.append("    ").append(field.getPre()).append(" ").append(field.getCompleteType()).append(" ").append(field.getKey()).append(";\n\n");
         }
         for (Node field : pojo.getFields()) {
